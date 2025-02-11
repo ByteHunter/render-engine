@@ -9,11 +9,11 @@ type Canvas struct {
 }
 
 func (c *Canvas) ClearBuffer() {
-    c.buffer.Reset()
+	c.buffer.Reset()
 }
 
 func (c *Canvas) ToString() string {
-    return c.buffer.String()
+	return c.buffer.String()
 }
 
 func (c *Canvas) SetBrush(b rune) {
@@ -47,4 +47,23 @@ func (c *Canvas) HorizontalLine(x, y, w int, r rune) {
 	for range w {
 		c.buffer.WriteRune(r)
 	}
+}
+
+func (c *Canvas) DrawSquare(x, y, w, h int) {
+	var tl, tr, bl, br rune = '╔', '╗', '╚', '╝'
+	var hr, vr rune = '═', '║'
+    // Draw the lines
+	c.HorizontalLine(x, y, w, hr)
+	c.HorizontalLine(x, y+h, w, hr)
+	c.VerticalLine(x, y, h, vr)
+	c.VerticalLine(x+w, y, h, vr)
+    // Draw the corners
+	c.buffer.WriteString(terminal.pos(x, y))
+	c.buffer.WriteRune(tl)
+	c.buffer.WriteString(terminal.pos(x+w, y))
+	c.buffer.WriteRune(tr)
+	c.buffer.WriteString(terminal.pos(x, y+h))
+	c.buffer.WriteRune(bl)
+	c.buffer.WriteString(terminal.pos(x+w, y+h))
+	c.buffer.WriteRune(br)
 }
