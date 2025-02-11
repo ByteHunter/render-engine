@@ -12,7 +12,7 @@ type Engine struct {
 	uiBack      Canvas
 	uiFront     Canvas
 	player      Player
-	room        Room
+	world       World
 }
 
 func NewEngine() *Engine {
@@ -22,7 +22,6 @@ func NewEngine() *Engine {
 		uiBack:      Canvas{},
 		uiFront:     Canvas{},
 		player:      Player{},
-		room:        Room{},
 	}
 }
 
@@ -76,18 +75,10 @@ func (e *Engine) ReadInput(channel <-chan []byte) []byte {
 func (e *Engine) Init() {
 	// Room canvas
 	e.roomsCanvas.DrawSquare(1, 1, terminal.width-uiWidth-2, terminal.height)
-	// We generate the room/s
-	e.room = *NewRoom(5, 5, 13, 7, true, true, true, true, true)
-	e.room.Draw(&e.roomsCanvas, 5, 3)
-	e.room.visible = false
-	for j := range 5 {
-		for i := range 9 {
-			if j == 0 && i == 0 {
-				continue
-			}
-			e.room.Draw(&e.roomsCanvas, 5+i*14, 3+j*8)
-		}
-	}
+	// We generate the world
+    e.world = *NewWorld()
+    e.world.Generate()
+    e.world.Draw(&e.roomsCanvas)
 	// Generate the player
 	e.player = Player{
 		x: 2, y: 2, char: '⍤', health: 3,
