@@ -3,12 +3,12 @@ package main
 import "fmt"
 
 type Player struct {
-	x, y int
-	char rune
-    health int
+	position Vector2d
+	char     rune
+	health   int
 }
 
 func (p *Player) Render() {
-	fmt.Print(terminal.pos(p.x, p.y))
+    fmt.Print(terminal.pos2d(p.position))
 	fmt.Printf("%c", p.char)
 }

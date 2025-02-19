@@ -5,12 +5,14 @@ import (
 )
 
 var terminal Terminal
+var term Terminal
 
 func main() {
 	terminal = *NewTerminal()
 	terminal.init()
 	terminal.LineWrap(false)
 	terminal.configure()
+    term = terminal
 	defer terminal.restore()
 
 

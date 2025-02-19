@@ -74,18 +74,18 @@ func (e *Engine) ReadInput(channel <-chan []byte) []byte {
 // Initialize logic
 func (e *Engine) Init() {
 	// Room canvas
-	e.roomsCanvas.DrawSquare(1, 1, terminal.width-uiWidth-2, terminal.height)
+	e.roomsCanvas.DrawSquare(Vector2d{1, 1}, Vector2d{term.width - uiWidth - 2, term.height})
 	// We generate the world
-    e.world = *NewWorld()
-    e.world.Generate()
-    e.world.Draw(&e.roomsCanvas)
+	e.world = *NewWorld()
+	e.world.Generate()
+	e.world.Draw(&e.roomsCanvas)
 	// Generate the player
 	e.player = Player{
-		x: 2, y: 2, char: '⍤', health: 3,
+		position: e.world.GetStartingPosition(), char: '⍤', health: 3,
 	}
 	// UI Static stuff
 	e.uiBack.ClearBuffer()
-	e.uiBack.DrawSquare(terminal.width-uiWidth, 1, uiWidth, terminal.height)
+	e.uiBack.DrawSquare(Vector2d{terminal.width - uiWidth, 1}, Vector2d{uiWidth, term.height})
 	// This is the "Ready to play screen"
 	fmt.Print(CLEAR_SCREEN)
 	fmt.Print(terminal.pos(1, 1))
@@ -95,35 +95,60 @@ func (e *Engine) Init() {
 // Update logic
 func (e *Engine) Update(r []byte) {
 	key := string(r)
+
+	// Pmayer movement
+	direction := V.Zero
 	if key == K_ARROW_UP || key == KEY_k {
-		e.player.y--
+		direction = V.Up
 	}
 	if key == K_ARROW_DOWN || key == KEY_j {
-		e.player.y++
+		direction = V.Down
 	}
 	if key == K_ARROW_LEFT || key == KEY_h {
-		e.player.x--
+		direction = V.Left
 	}
 	if key == K_ARROW_RIGHT || key == KEY_l {
-		e.player.x++
+		direction = V.Right
 	}
+	e.player.position = V.Sum(e.player.position, direction)
+	// Safe guard the player from leaving the room boundaries too soon
+	bMin, bMax := e.world.GetRoomInnerBounds(0)
+	e.player.position.y = Clamp(e.player.position.y, bMin.y, bMax.y)
+	e.player.position.x = Clamp(e.player.position.x, bMin.x, bMax.x)
+	// Safeguard the player from leaving the world or terminal area
+	e.player.position.y = Clamp(e.player.position.y, 1, terminal.height)
+	e.player.position.x = Clamp(e.player.position.x, 1, terminal.width-uiWidth)
 
-	e.player.y = Clamp(1, 45, e.player.y)
-	e.player.x = Clamp(1, 153, e.player.x)
+	e.DrawUi()
+}
 
+func (e *Engine) DrawUi() {
 	// Some UI updates
 	e.uiFront.ClearBuffer()
 	// UI info
-	e.uiFront.buffer.WriteString(terminal.pos(terminal.width-23, 2))
-	e.uiFront.buffer.WriteString("Health: " + strings.Repeat("♥", e.player.health))
-	// e.uiFront.buffer.WriteString(terminal.pos(terminal.width-23, 3))
-	// e.uiFront.buffer.WriteString(fmt.Sprintf("Size: %dx%d", terminal.width, terminal.height))
-	// e.uiFront.buffer.WriteString(terminal.pos(terminal.width-23, 4))
-	// e.uiFront.buffer.WriteString(fmt.Sprintf("UI: %dx%d", 25, terminal.height))
-	// e.uiFront.buffer.WriteString(terminal.pos(terminal.width-23, 5))
-	// e.uiFront.buffer.WriteString(fmt.Sprintf("World: %dx%d", terminal.width-25, terminal.height))
-	// e.uiFront.buffer.WriteString(terminal.pos(terminal.width-23, 6))
-	// e.uiFront.buffer.WriteString(fmt.Sprintf("Player: %dx%d", e.player.x, e.player.y))
+	// e.uiFront.AddString(terminal.pos(terminal.width-23, 2))
+	// e.uiFront.AddString("Health: " + strings.Repeat("♥", e.player.health))
+	// e.uiFront.AddString(terminal.pos(terminal.width-23, 3))
+	// e.uiFront.AddString(fmt.Sprintf("Size: %dx%d", terminal.width, terminal.height))
+	// e.uiFront.AddString(terminal.pos(terminal.width-23, 4))
+	// e.uiFront.AddString(fmt.Sprintf("UI: %dx%d", uiWidth, terminal.height))
+	// e.uiFront.AddString(terminal.pos(terminal.width-23, 5))
+	// e.uiFront.AddString(fmt.Sprintf("World: %dx%d", terminal.width-uiWidth, terminal.height))
+	// e.uiFront.AddString(terminal.pos(terminal.width-23, 6))
+	// e.uiFront.AddString(fmt.Sprintf("Player: %dx%d", e.player.position.x, e.player.position.y))
+
+	// Automatic placing?
+	uiStrings := []string{
+		"Health: " + strings.Repeat("♥", e.player.health),
+		fmt.Sprintf("Size: %dx%d", terminal.width, terminal.height),
+		fmt.Sprintf("UI: %dx%d", uiWidth, terminal.height),
+		fmt.Sprintf("World: %dx%d", terminal.width-uiWidth, terminal.height),
+		fmt.Sprintf("Player: %dx%d", e.player.position.x, e.player.position.y),
+	}
+	for i, s := range uiStrings {
+		e.uiFront.AddString(terminal.pos(terminal.width-23, 2 + i))
+        e.uiFront.AddString(s)
+	}
 }
 
 // Rendering logic

@@ -20,6 +20,7 @@ var TCONF_NORMAL = []string{
 
 type Terminal struct {
 	width, height int
+	size          Vector2d
 }
 
 func NewTerminal() *Terminal {
@@ -80,7 +81,9 @@ func (t *Terminal) LineWrap(b bool) {
 // CONFIGURE
 
 func (t *Terminal) init() {
-	t.width, t.height = GetTerminalSize()
+	width, height := GetTerminalSize()
+	t.width, t.height = width, height
+	t.size = Vector2d{width, height}
 }
 
 func (t *Terminal) configure() {
@@ -112,22 +115,25 @@ func (t *Terminal) reset() string {
 }
 
 func (t *Terminal) pos(x, y int) string {
-    return CSI + NUMS[y] + SEP + NUMS[x] + "H"
+	return CSI + NUMS[y] + SEP + NUMS[x] + "H"
+}
+
+func (t *Terminal) pos2d(p Vector2d) string {
+	return CSI + NUMS[p.y] + SEP + NUMS[p.x] + "H"
 }
 
 func (t *Terminal) cursorUp(n int) string {
-    return CSI + NUMS[n] + "A"
+	return CSI + NUMS[n] + "A"
 }
 
 func (t *Terminal) cursorDown(n int) string {
-    return CSI + NUMS[n] + "B"
+	return CSI + NUMS[n] + "B"
 }
 
 func (t *Terminal) cursorForward(n int) string {
-    return CSI + NUMS[n] + "C"
+	return CSI + NUMS[n] + "C"
 }
 
 func (t *Terminal) cursorBackward(n int) string {
-    return CSI + NUMS[n] + "D"
+	return CSI + NUMS[n] + "D"
 }
-
