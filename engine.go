@@ -87,6 +87,8 @@ func (e *Engine) Init() {
 		char:          '⍤',
 		health:        3,
 	}
+    startingRoom,_ := e.world.GetRoom(e.player.currentRoom)
+    e.player.roomPosition = startingRoom.GetSpawnLocation()
 	// UI Static stuff
 	e.uiBack.ClearBuffer()
 	e.uiBack.DrawSquare(Vector2d{terminal.width - uiWidth, 1}, Vector2d{uiWidth, term.height})

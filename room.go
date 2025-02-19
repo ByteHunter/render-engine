@@ -27,6 +27,10 @@ func (r *Room) IsValidPosition(pos Vector2d) bool {
 	return true
 }
 
+func (r *Room) GetSpawnLocation() Vector2d {
+	return Vector2d{r.size.x / 2, r.size.y / 2}
+}
+
 func (r *Room) IsDoor(pos Vector2d) bool {
 	if (V.Equal(pos, Vector2d{15, 0}) && r.a) {
 		return true
