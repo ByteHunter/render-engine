@@ -119,16 +119,16 @@ func (e *Engine) Update(r []byte) {
 	e.player.position.y = Clamp(e.player.position.y, 1, terminal.height)
 	e.player.position.x = Clamp(e.player.position.x, 1, terminal.width-uiWidth)
 
-	e.DrawUi()
+	e.UpdateUi()
 }
 
-func (e *Engine) DrawUi() {
+func (e *Engine) UpdateUi() {
 	// Some UI updates
 	e.uiFront.ClearBuffer()
 	// UI info
 	uiStrings := []string{
 		"Health: " + strings.Repeat("♥", e.player.health),
-        "------- DEBUG: -------",
+		"------- DEBUG: -------",
 		fmt.Sprintf("Terminal: %3dx%d", terminal.width, terminal.height),
 		fmt.Sprintf("UI:       %3dx%d", uiWidth, terminal.height),
 		fmt.Sprintf("World:    %3dx%d", terminal.width-uiWidth, terminal.height),
@@ -136,8 +136,8 @@ func (e *Engine) DrawUi() {
 		fmt.Sprintf("P. World: %3dx%d", e.player.position.x-e.world.position.x, e.player.position.y-e.world.position.y),
 	}
 	for i, s := range uiStrings {
-		e.uiFront.AddString(terminal.pos(terminal.width-23, 2 + i))
-        e.uiFront.AddString(s)
+		e.uiFront.AddString(terminal.pos(terminal.width-23, 2+i))
+		e.uiFront.AddString(s)
 	}
 }
 
