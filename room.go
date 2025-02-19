@@ -28,6 +28,9 @@ func (r *Room) IsValidPosition(pos Vector2d) bool {
 }
 
 func (r *Room) IsDoor(pos Vector2d) bool {
+    if (V.Equal(pos, Vector2d{29, 5})) {
+        return true
+    }
     return false
 }
 

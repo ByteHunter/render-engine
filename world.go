@@ -21,10 +21,16 @@ func (w *World) Generate() {
 	w.rooms = append(w.rooms, *NewRoom(
 		Vector2d{1, 0}, Vector2d{30, 10}, true, true, true, true, true,
 	))
+	w.rooms = append(w.rooms, *NewRoom(
+		Vector2d{2, 0}, Vector2d{30, 10}, true, true, true, true, true,
+	))
+	w.rooms = append(w.rooms, *NewRoom(
+		Vector2d{3, 0}, Vector2d{30, 10}, true, true, true, true, true,
+	))
 }
 
 func (w *World) GetStartingRoomIndex() int {
-    return 0
+	return 0
 }
 
 func (w *World) GetStartingPosition() Vector2d {
@@ -44,13 +50,22 @@ func (w *World) GetStartingPosition() Vector2d {
 	return V.Sum(w.position, V.Identity)
 }
 
+func (w *World) GetRoomWoldPosition(index int) Vector2d {
+	r := w.rooms[index]
+	pad := V.Sum(r.size, V.Identity)
+	return Vector2d{
+		x: pad.x * r.pos.x,
+		y: pad.y * r.pos.y,
+	}
+}
+
 func (w *World) GetRoomInnerBounds(index int) (Vector2d, Vector2d) {
 	if len(w.rooms) < (index + 1) {
 		return w.position, w.position
 	}
 	r := w.rooms[index]
 	pad := V.Sum(r.size, V.Identity)
-    topLeft := V.Sum(w.position, Vector2d{pad.x * r.pos.x, pad.y * r.pos.y})
+	topLeft := V.Sum(w.position, Vector2d{pad.x * r.pos.x, pad.y * r.pos.y})
 	return topLeft, V.Sum(
 		topLeft,
 		Vector2d{

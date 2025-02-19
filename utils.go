@@ -25,6 +25,7 @@ var V = struct {
 	Right    Vector2d
 	Up       Vector2d
 	Down     Vector2d
+	Equal    func(Vector2d, Vector2d) bool
 	Negate   func(Vector2d) Vector2d
 	Sum      func(Vector2d, Vector2d) Vector2d
 	Multiply func(Vector2d, int) Vector2d
@@ -36,6 +37,9 @@ var V = struct {
 	Right:    Vector2d{1, 0},
 	Up:       Vector2d{0, -1},
 	Down:     Vector2d{0, 1},
+	Equal: func(a Vector2d, b Vector2d) bool {
+        return a.x == b.x && a.y == b.y
+	},
 	Negate: func(a Vector2d) Vector2d {
 		return Vector2d{
 			-a.x,

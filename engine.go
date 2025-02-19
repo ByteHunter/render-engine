@@ -121,10 +121,13 @@ func (e *Engine) UpdatePlayer(key string) {
 	}
 	// Updating the room position
 	nextPosition := V.Sum(e.player.roomPosition, direction)
-	if e.world.rooms[e.player.currentRoom].IsValidPosition(nextPosition) {
+    r := e.world.rooms[e.player.currentRoom]
+    if (r.IsDoor(nextPosition)) {
+        e.player.currentRoom++
+        e.player.roomPosition = Vector2d{1, 5}
+    }
+	if r.IsValidPosition(nextPosition) {
 		e.player.roomPosition = nextPosition
-		// e.player.roomPosition.y = Clamp(e.player.roomPosition.y, 1, 8)
-		// e.player.roomPosition.x = Clamp(e.player.roomPosition.x, 1, 28)
 	}
 }
 
@@ -159,5 +162,6 @@ func (e *Engine) Render() {
 	fmt.Print(e.uiFront.ToString())
 
 	renderPos := V.Sum(e.player.roomPosition, e.world.position)
+    renderPos = V.Sum(renderPos, e.world.GetRoomWoldPosition(e.player.currentRoom))
 	e.player.RenderAt(renderPos)
 }
