@@ -81,10 +81,11 @@ func (e *Engine) Init() {
 	e.world.Draw(&e.roomsCanvas)
 	// Generate the player
 	e.player = Player{
-		position:     e.world.GetStartingPosition(),
-		roomPosition: V.Zero,
-		char:         '⍤',
-		health:       3,
+		worldPosition: V.Zero,
+		roomPosition:  V.Identity,
+		currentRoom:   0,
+		char:          '⍤',
+		health:        3,
 	}
 	// UI Static stuff
 	e.uiBack.ClearBuffer()
@@ -99,7 +100,7 @@ func (e *Engine) Init() {
 func (e *Engine) Update(r []byte) {
 	key := string(r)
 
-    e.UpdatePlayer(key)
+	e.UpdatePlayer(key)
 	e.UpdateUi()
 }
 
@@ -118,14 +119,13 @@ func (e *Engine) UpdatePlayer(key string) {
 	if key == K_ARROW_RIGHT || key == KEY_l {
 		direction = V.Right
 	}
-	e.player.position = V.Sum(e.player.position, direction)
-	// Safe guard the player from leaving the room boundaries too soon
-	bMin, bMax := e.world.GetRoomInnerBounds(1)
-	e.player.position.y = Clamp(e.player.position.y, bMin.y, bMax.y)
-	e.player.position.x = Clamp(e.player.position.x, bMin.x, bMax.x)
-	// Safeguard the player from leaving the world or terminal area
-	e.player.position.y = Clamp(e.player.position.y, 1, terminal.height)
-	e.player.position.x = Clamp(e.player.position.x, 1, terminal.width-uiWidth)
+	// Updating the room position
+	nextPosition := V.Sum(e.player.roomPosition, direction)
+	if e.world.rooms[e.player.currentRoom].IsValidPosition(nextPosition) {
+		e.player.roomPosition = nextPosition
+		// e.player.roomPosition.y = Clamp(e.player.roomPosition.y, 1, 8)
+		// e.player.roomPosition.x = Clamp(e.player.roomPosition.x, 1, 28)
+	}
 }
 
 func (e *Engine) UpdateUi() {
@@ -135,11 +135,13 @@ func (e *Engine) UpdateUi() {
 	uiStrings := []string{
 		"Health: " + strings.Repeat("♥", e.player.health),
 		"------- DEBUG: -------",
-		fmt.Sprintf("Terminal: %3dx%d", terminal.width, terminal.height),
-		fmt.Sprintf("UI:       %3dx%d", uiWidth, terminal.height),
-		fmt.Sprintf("World:    %3dx%d", terminal.width-uiWidth, terminal.height),
-		fmt.Sprintf("Player:   %3dx%d", e.player.position.x, e.player.position.y),
-		fmt.Sprintf("P. World: %3dx%d", e.player.position.x-e.world.position.x, e.player.position.y-e.world.position.y),
+		fmt.Sprintf("Terminal:  %3dx%d", terminal.width, terminal.height),
+		fmt.Sprintf("UI:        %3dx%d", uiWidth, terminal.height),
+		fmt.Sprintf("World:     %3dx%d", terminal.width-uiWidth, terminal.height),
+		fmt.Sprintf("Player:    %3dx%d", e.player.worldPosition.x, e.player.worldPosition.y),
+		fmt.Sprintf("P. World:  %3dx%d", e.player.worldPosition.x, e.player.worldPosition.y),
+		fmt.Sprintf("P. Room:   %3dx%d", e.player.roomPosition.x, e.player.roomPosition.y),
+		fmt.Sprintf("Cur. Room: %3d", e.player.currentRoom),
 	}
 	for i, s := range uiStrings {
 		e.uiFront.AddString(terminal.pos(terminal.width-23, 2+i))
@@ -150,9 +152,12 @@ func (e *Engine) UpdateUi() {
 // Rendering logic
 func (e *Engine) Render() {
 	fmt.Print(CLEAR_SCREEN)
+
 	fmt.Print(e.canvas.ToString())
 	fmt.Print(e.roomsCanvas.ToString())
 	fmt.Print(e.uiBack.ToString())
 	fmt.Print(e.uiFront.ToString())
-	e.player.RenderAt(e.player.position)
+
+	renderPos := V.Sum(e.player.roomPosition, e.world.position)
+	e.player.RenderAt(renderPos)
 }

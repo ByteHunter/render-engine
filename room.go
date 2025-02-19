@@ -21,7 +21,14 @@ func NewRoom(pos, size Vector2d, visible, a, b, c, d bool) *Room {
 }
 
 func (r *Room) IsValidPosition(pos Vector2d) bool {
+    if (pos.x < 1 || pos.x > 28 || pos.y < 1 || pos.y > 8) {
+        return false
+    }
     return true
+}
+
+func (r *Room) IsDoor(pos Vector2d) bool {
+    return false
 }
 
 // Draw a room at a given position in a Canvas
