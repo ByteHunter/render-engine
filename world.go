@@ -1,45 +1,45 @@
 package main
 
 type World struct {
-	rooms       []Room
+	rooms       []*Room
 	position    Vector2d
 	currentRoom int
 }
 
 func NewWorld() *World {
 	return &World{
-		rooms:       []Room{},
+        rooms: []*Room{},
 		position:    Vector2d{45, 15},
 		currentRoom: 0,
 	}
 }
 
 func (w *World) Generate() {
-	w.rooms = append(w.rooms, *NewRoom(
+	w.rooms = append(w.rooms, NewRoom(
 		Vector2d{0, 0}, Vector2d{30, 10}, true, true, true, true, true,
 	))
-	w.rooms = append(w.rooms, *NewRoom(
-		Vector2d{1, 0}, Vector2d{30, 10}, true, false, false, false, true,
+	w.rooms = append(w.rooms, NewRoom(
+		Vector2d{1, 0}, Vector2d{30, 10}, false, false, false, false, true,
 	))
-	w.rooms = append(w.rooms, *NewRoom(
-		Vector2d{0, 1}, Vector2d{30, 10}, true, true, false, false, false,
+	w.rooms = append(w.rooms, NewRoom(
+		Vector2d{0, 1}, Vector2d{30, 10}, false, true, false, false, false,
 	))
-	w.rooms = append(w.rooms, *NewRoom(
-		Vector2d{-1, 0}, Vector2d{30, 10}, true, false, true, false, false,
+	w.rooms = append(w.rooms, NewRoom(
+		Vector2d{-1, 0}, Vector2d{30, 10}, false, false, true, false, false,
 	))
-	w.rooms = append(w.rooms, *NewRoom(
-		Vector2d{0, -1}, Vector2d{30, 10}, true, false, false, true, false,
+	w.rooms = append(w.rooms, NewRoom(
+		Vector2d{0, -1}, Vector2d{30, 10}, false, false, false, true, false,
 	))
 }
 
-func (w *World) GetRoom(pos Vector2d) (Room, bool) {
+func (w *World) GetRoom(pos Vector2d) (*Room, bool) {
 	for _, room := range w.rooms {
 		if V.Equal(room.pos, pos) {
 			return room, true
 		}
 	}
 
-	return Room{}, false
+	return &Room{}, false
 }
 
 func (w *World) GetStartingRoomIndex() int {

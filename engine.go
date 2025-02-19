@@ -13,6 +13,7 @@ type Engine struct {
 	uiFront     Canvas
 	player      Player
 	world       World
+	logs        []string
 }
 
 func NewEngine() *Engine {
@@ -22,6 +23,7 @@ func NewEngine() *Engine {
 		uiBack:      Canvas{},
 		uiFront:     Canvas{},
 		player:      Player{},
+		logs:        []string{},
 	}
 }
 
@@ -87,8 +89,8 @@ func (e *Engine) Init() {
 		char:          '⍤',
 		health:        3,
 	}
-    startingRoom,_ := e.world.GetRoom(e.player.currentRoom)
-    e.player.roomPosition = startingRoom.GetSpawnLocation()
+	startingRoom, _ := e.world.GetRoom(e.player.currentRoom)
+	e.player.roomPosition = startingRoom.GetSpawnLocation()
 	// UI Static stuff
 	e.uiBack.ClearBuffer()
 	e.uiBack.DrawSquare(Vector2d{terminal.width - uiWidth, 1}, Vector2d{uiWidth, term.height})
@@ -126,11 +128,19 @@ func (e *Engine) UpdatePlayer(key string) {
 	r, _ := e.world.GetRoom(e.player.currentRoom)
 
 	if r.IsDoor(nextPosition) {
-        doorDirection := r.GetDoorDirection(nextPosition)
-        e.player.currentRoom = V.Sum(e.player.currentRoom, doorDirection)
-        e.player.roomPosition = r.GetNextRoomEnterPosition(nextPosition)
+		doorDirection := r.GetDoorDirection(nextPosition)
+		e.player.currentRoom = V.Sum(e.player.currentRoom, doorDirection)
+		e.player.roomPosition = r.GetNextRoomEnterPosition(nextPosition)
 
-        return
+		// Reveal next room
+		nextRoom, _ := e.world.GetRoom(e.player.currentRoom)
+		if !nextRoom.visible {
+			nextRoom.visible = true
+			e.roomsCanvas.ClearBuffer()
+			e.world.Draw(&e.roomsCanvas)
+		}
+
+		return
 	}
 	if r.IsValidPosition(nextPosition) {
 		e.player.roomPosition = nextPosition

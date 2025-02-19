@@ -12,11 +12,10 @@ func main() {
 	terminal.init()
 	terminal.LineWrap(false)
 	terminal.configure()
-    term = terminal
+	term = terminal
 	defer terminal.restore()
 
-
-    engine := NewEngine()
+	engine := NewEngine()
 
 	fmt.Printf(CLEAR_SCREEN)
 	fmt.Printf(HOME)
@@ -28,5 +27,10 @@ func main() {
 	terminal.LineWrap(true)
 	fmt.Printf(RESET)
 	fmt.Printf(terminal.pos(1, terminal.height))
-}
 
+	if len(engine.logs) > 0 {
+		for _, s := range engine.logs {
+			fmt.Print(s)
+		}
+	}
+}
