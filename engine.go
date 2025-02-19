@@ -83,7 +83,7 @@ func (e *Engine) Init() {
 	e.player = Player{
 		worldPosition: V.Zero,
 		roomPosition:  V.Identity,
-		currentRoom:   0,
+		currentRoom:   V.Zero,
 		char:          '⍤',
 		health:        3,
 	}
@@ -121,11 +121,15 @@ func (e *Engine) UpdatePlayer(key string) {
 	}
 	// Updating the room position
 	nextPosition := V.Sum(e.player.roomPosition, direction)
-    r := e.world.rooms[e.player.currentRoom]
-    if (r.IsDoor(nextPosition)) {
-        e.player.currentRoom++
-        e.player.roomPosition = Vector2d{1, 5}
-    }
+	r, _ := e.world.GetRoom(e.player.currentRoom)
+
+	if r.IsDoor(nextPosition) {
+        doorDirection := r.GetDoorDirection(nextPosition)
+        e.player.currentRoom = V.Sum(e.player.currentRoom, doorDirection)
+        e.player.roomPosition = r.GetNextRoomEnterPosition(nextPosition)
+
+        return
+	}
 	if r.IsValidPosition(nextPosition) {
 		e.player.roomPosition = nextPosition
 	}
@@ -141,10 +145,8 @@ func (e *Engine) UpdateUi() {
 		fmt.Sprintf("Terminal:  %3dx%d", terminal.width, terminal.height),
 		fmt.Sprintf("UI:        %3dx%d", uiWidth, terminal.height),
 		fmt.Sprintf("World:     %3dx%d", terminal.width-uiWidth, terminal.height),
-		fmt.Sprintf("Player:    %3dx%d", e.player.worldPosition.x, e.player.worldPosition.y),
-		fmt.Sprintf("P. World:  %3dx%d", e.player.worldPosition.x, e.player.worldPosition.y),
-		fmt.Sprintf("P. Room:   %3dx%d", e.player.roomPosition.x, e.player.roomPosition.y),
-		fmt.Sprintf("Cur. Room: %3d", e.player.currentRoom),
+		fmt.Sprintf("Pos. Room: %3dx%d", e.player.roomPosition.x, e.player.roomPosition.y),
+		fmt.Sprintf("Cur. Room: %3dx%d", e.player.currentRoom.x, e.player.currentRoom.y),
 	}
 	for i, s := range uiStrings {
 		e.uiFront.AddString(terminal.pos(terminal.width-23, 2+i))
@@ -162,6 +164,6 @@ func (e *Engine) Render() {
 	fmt.Print(e.uiFront.ToString())
 
 	renderPos := V.Sum(e.player.roomPosition, e.world.position)
-    renderPos = V.Sum(renderPos, e.world.GetRoomWoldPosition(e.player.currentRoom))
+	renderPos = V.Sum(renderPos, e.world.GetRoomWoldPosition(e.player.currentRoom))
 	e.player.RenderAt(renderPos)
 }

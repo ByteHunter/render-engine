@@ -21,17 +21,61 @@ func NewRoom(pos, size Vector2d, visible, a, b, c, d bool) *Room {
 }
 
 func (r *Room) IsValidPosition(pos Vector2d) bool {
-    if (pos.x < 1 || pos.x > 28 || pos.y < 1 || pos.y > 8) {
-        return false
-    }
-    return true
+	if pos.x < 1 || pos.x > 28 || pos.y < 1 || pos.y > 8 {
+		return false
+	}
+	return true
 }
 
 func (r *Room) IsDoor(pos Vector2d) bool {
-    if (V.Equal(pos, Vector2d{29, 5})) {
-        return true
-    }
-    return false
+	if (V.Equal(pos, Vector2d{15, 0}) && r.a) {
+		return true
+	}
+	if (V.Equal(pos, Vector2d{29, 5}) && r.b) {
+		return true
+	}
+	if (V.Equal(pos, Vector2d{15, 9}) && r.c) {
+		return true
+	}
+	if (V.Equal(pos, Vector2d{0, 5}) && r.d) {
+		return true
+	}
+
+	return false
+}
+
+func (r *Room) GetDoorDirection(pos Vector2d) Vector2d {
+	if (V.Equal(pos, Vector2d{15, 0})) {
+		return V.Up
+	}
+	if (V.Equal(pos, Vector2d{29, 5})) {
+		return V.Right
+	}
+	if (V.Equal(pos, Vector2d{15, 9})) {
+		return V.Down
+	}
+	if (V.Equal(pos, Vector2d{0, 5})) {
+		return V.Left
+	}
+
+	return V.Zero
+}
+
+func (r *Room) GetNextRoomEnterPosition(pos Vector2d) Vector2d {
+	if (V.Equal(pos, Vector2d{15, 0})) {
+		return Vector2d{15, 8}
+	}
+	if (V.Equal(pos, Vector2d{29, 5})) {
+		return Vector2d{1, 5}
+	}
+	if (V.Equal(pos, Vector2d{15, 9})) {
+		return Vector2d{15, 1}
+	}
+	if (V.Equal(pos, Vector2d{0, 5})) {
+		return Vector2d{28, 5}
+	}
+
+	return V.Identity
 }
 
 // Draw a room at a given position in a Canvas

@@ -5,7 +5,7 @@ import "fmt"
 type Player struct {
 	worldPosition Vector2d // This should be the world position instead
 	roomPosition  Vector2d
-	currentRoom   int
+	currentRoom   Vector2d
 	char          rune
 	health        int
 }
