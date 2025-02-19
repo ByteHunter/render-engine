@@ -9,7 +9,7 @@ type World struct {
 func NewWorld() *World {
 	return &World{
 		rooms:       []Room{},
-		position:    Vector2d{2, 2},
+		position:    Vector2d{5, 5},
 		currentRoom: 0,
 	}
 }
@@ -23,14 +23,21 @@ func (w *World) Generate() {
 	))
 }
 
+func (w *World) GetStartingRoomIndex() int {
+    return 0
+}
+
 func (w *World) GetStartingPosition() Vector2d {
 	if len(w.rooms) > 0 {
-		topLeft := V.Sum(w.position, V.Zero)
+		roomIndex := 1
+		r := w.rooms[roomIndex]
+		pad := V.Sum(r.size, V.Identity)
+		topLeft := V.Sum(w.position, Vector2d{pad.x * r.pos.x, pad.y * r.pos.y})
 		return V.Sum(
 			topLeft,
 			Vector2d{
-				w.rooms[0].size.x/2 - 0,
-				w.rooms[0].size.y/2 - 0,
+				r.size.x/2 - 0,
+				r.size.y/2 - 0,
 			},
 		)
 	}
@@ -41,12 +48,14 @@ func (w *World) GetRoomInnerBounds(index int) (Vector2d, Vector2d) {
 	if len(w.rooms) < (index + 1) {
 		return w.position, w.position
 	}
-	topLeft := V.Sum(w.position, V.Zero)
+	r := w.rooms[index]
+	pad := V.Sum(r.size, V.Identity)
+    topLeft := V.Sum(w.position, Vector2d{pad.x * r.pos.x, pad.y * r.pos.y})
 	return topLeft, V.Sum(
 		topLeft,
 		Vector2d{
-			w.rooms[0].size.x - 1,
-			w.rooms[0].size.y - 1,
+			r.size.x - 1,
+			r.size.y - 1,
 		},
 	)
 }

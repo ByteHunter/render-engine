@@ -2,7 +2,7 @@ package main
 
 type Room struct {
 	id         int
-	pos        Vector2d // This will be the position
+	pos        Vector2d // This is the position on the world grid
 	size       Vector2d
 	visible    bool
 	a, b, c, d bool // These are the available doors, clockwise from the top (a)

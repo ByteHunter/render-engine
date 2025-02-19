@@ -81,7 +81,10 @@ func (e *Engine) Init() {
 	e.world.Draw(&e.roomsCanvas)
 	// Generate the player
 	e.player = Player{
-		position: e.world.GetStartingPosition(), char: '⍤', health: 3,
+		position:     e.world.GetStartingPosition(),
+		roomPosition: V.Zero,
+		char:         '⍤',
+		health:       3,
 	}
 	// UI Static stuff
 	e.uiBack.ClearBuffer()
@@ -96,7 +99,12 @@ func (e *Engine) Init() {
 func (e *Engine) Update(r []byte) {
 	key := string(r)
 
-	// Pmayer movement
+    e.UpdatePlayer(key)
+	e.UpdateUi()
+}
+
+func (e *Engine) UpdatePlayer(key string) {
+	// Player movement
 	direction := V.Zero
 	if key == K_ARROW_UP || key == KEY_k {
 		direction = V.Up
@@ -112,14 +120,12 @@ func (e *Engine) Update(r []byte) {
 	}
 	e.player.position = V.Sum(e.player.position, direction)
 	// Safe guard the player from leaving the room boundaries too soon
-	bMin, bMax := e.world.GetRoomInnerBounds(0)
+	bMin, bMax := e.world.GetRoomInnerBounds(1)
 	e.player.position.y = Clamp(e.player.position.y, bMin.y, bMax.y)
 	e.player.position.x = Clamp(e.player.position.x, bMin.x, bMax.x)
 	// Safeguard the player from leaving the world or terminal area
 	e.player.position.y = Clamp(e.player.position.y, 1, terminal.height)
 	e.player.position.x = Clamp(e.player.position.x, 1, terminal.width-uiWidth)
-
-	e.UpdateUi()
 }
 
 func (e *Engine) UpdateUi() {
@@ -148,5 +154,5 @@ func (e *Engine) Render() {
 	fmt.Print(e.roomsCanvas.ToString())
 	fmt.Print(e.uiBack.ToString())
 	fmt.Print(e.uiFront.ToString())
-	e.player.Render()
+	e.player.RenderAt(e.player.position)
 }
