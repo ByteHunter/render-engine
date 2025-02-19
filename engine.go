@@ -126,24 +126,14 @@ func (e *Engine) DrawUi() {
 	// Some UI updates
 	e.uiFront.ClearBuffer()
 	// UI info
-	// e.uiFront.AddString(terminal.pos(terminal.width-23, 2))
-	// e.uiFront.AddString("Health: " + strings.Repeat("♥", e.player.health))
-	// e.uiFront.AddString(terminal.pos(terminal.width-23, 3))
-	// e.uiFront.AddString(fmt.Sprintf("Size: %dx%d", terminal.width, terminal.height))
-	// e.uiFront.AddString(terminal.pos(terminal.width-23, 4))
-	// e.uiFront.AddString(fmt.Sprintf("UI: %dx%d", uiWidth, terminal.height))
-	// e.uiFront.AddString(terminal.pos(terminal.width-23, 5))
-	// e.uiFront.AddString(fmt.Sprintf("World: %dx%d", terminal.width-uiWidth, terminal.height))
-	// e.uiFront.AddString(terminal.pos(terminal.width-23, 6))
-	// e.uiFront.AddString(fmt.Sprintf("Player: %dx%d", e.player.position.x, e.player.position.y))
-
-	// Automatic placing?
 	uiStrings := []string{
 		"Health: " + strings.Repeat("♥", e.player.health),
-		fmt.Sprintf("Size: %dx%d", terminal.width, terminal.height),
-		fmt.Sprintf("UI: %dx%d", uiWidth, terminal.height),
-		fmt.Sprintf("World: %dx%d", terminal.width-uiWidth, terminal.height),
-		fmt.Sprintf("Player: %dx%d", e.player.position.x, e.player.position.y),
+        "------- DEBUG: -------",
+		fmt.Sprintf("Terminal: %3dx%d", terminal.width, terminal.height),
+		fmt.Sprintf("UI:       %3dx%d", uiWidth, terminal.height),
+		fmt.Sprintf("World:    %3dx%d", terminal.width-uiWidth, terminal.height),
+		fmt.Sprintf("Player:   %3dx%d", e.player.position.x, e.player.position.y),
+		fmt.Sprintf("P. World: %3dx%d", e.player.position.x-e.world.position.x, e.player.position.y-e.world.position.y),
 	}
 	for i, s := range uiStrings {
 		e.uiFront.AddString(terminal.pos(terminal.width-23, 2 + i))
